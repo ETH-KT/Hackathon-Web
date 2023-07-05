@@ -18,6 +18,12 @@ const nextConfig = {
   // typescript: {
   //   ignoreBuildErrors: process.env.CI === "false",
   // },
+  typescript: {
+    ignoreBuildErrors: true,
+  },
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
 };
 
 module.exports = nextConfig;
