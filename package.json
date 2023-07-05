@@ -18,6 +18,7 @@
     "@polkadot/api": "^10.9.1",
     "@polkadot/util": "^12.3.2",
     "@polkadot/util-crypto": "^12.3.2",
+    "@suiet/wallet-kit": "^0.2.15",
     "antd": "^5.6.3",
     "autoprefixer": "10.4.14",
     "axios": "^1.4.0",

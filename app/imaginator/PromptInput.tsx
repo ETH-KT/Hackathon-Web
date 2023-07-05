@@ -23,6 +23,14 @@ import { useSetAtom } from "jotai";
 import { Spin, Modal } from "antd";
 import { LoadingOutlined } from "@ant-design/icons";
 
+import { useWallet, ConnectModal } from "@suiet/wallet-kit";
+import { TransactionBlock, JsonRpcProvider, Connection } from "@mysten/sui.js";
+const provider = new JsonRpcProvider(
+  new Connection({
+    fullnode: "https://sui-testnet-rpc.allthatnode.com",
+  })
+);
+
 function PromptInput() {
   const account = useAccount();
   const publicClient = usePublicClient();
@@ -99,10 +107,74 @@ function PromptInput() {
       .finally(() => setIsLoading(false));
     setCurrentTxHash(hash);
   };
-
   const [show, setShow] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
+
+
+
+
+  /*
+  uodate
+  */
+  const wallet = useWallet();
+  const [address, setAddress] = useState("");
+  const [maxGasPrice, setMaxGasPrice] = useState(100_000_000); // 0.1Sui
+  const [coin, setCoin] = useState(0);
+  
+  const handleExecuteMoveCall = async () => {
+    if (!wallet.connected) {
+      alert("please click connect wallet");
+      return;
+    }
+    try {
+      const tx = new TransactionBlock();
+      const [_coin] = tx.splitCoins(tx.gas, [tx.pure(coin)]);
+      console.log(_coin,);   
+      tx.setGasBudget = 100_000_000 as any;
+      tx.moveCall({
+        target: "0x86e2ab6c370fbfed0ee955158ca95ca5b465dede4a79eb3594d2959e72d3d62a::cybrosnetwork::broker",
+        arguments: [tx.object("0x7ebefe8b5843f47d8ec17fad74b39cd49d5e074d9a9f6ec4cb4791c0df7d393a"), _coin, tx.pure(prompt)],
+      });
+      tx.transferObjects([_coin], tx.pure(wallet.address));
+      const resData = await wallet.signAndExecuteTransactionBlock({
+        transactionBlock: tx,
+      });
+      console.log("executeMoveCall success", resData);
+    } catch (e) {
+      console.error("executeMoveCall failed", e);
+    }
+  };
+
+  const getCoin = async () => {
+    if (address !== "") {
+      const allCoins = await provider.getCoins({
+        owner: address,
+        coinType: "0x2::sui::SUI",
+      });
+      
+      if (allCoins.data.length > 0) {
+        const total = allCoins.data.reduce((acc, item) => acc + Number(item.balance), 0);
+        setCoin(total - maxGasPrice);
+      } else {
+        setCoin(0);
+      }
+    }
+  };
+  useEffect(() => {
+    if (wallet.connected) {
+      setAddress(wallet.address as string);
+    }
+  }, [wallet]);
+
+  useEffect(() => {
+    getCoin();
+  }, [address]);
+
+  // useEffect(()=>{
+  //   wallet.disconnect();
+  //   console.log(address,coin);
+  // },[]);
   const SpinIndicator = (tint?: string) => {
     return (
       <LoadingOutlined
@@ -183,7 +255,7 @@ function PromptInput() {
         <div className="flex justify-start mx-[33px] mb-6">
           <button
             className=" justify-center items-center shadow-cb shadow-entrance-aigc hover:shadow-faucetEn text-entrance-aigc font-medium leading-[21px] rounded-15 bg-white/[0.72] text-[16px] h-[45px]"
-            onClick={sendTx}
+            onClick={handleExecuteMoveCall}
             disabled={isLoading || prompt.trim() === ""}
           >
             <p className="mx-6">{isLoading ? "Generating" : "Generate"}</p>
@@ -191,6 +263,7 @@ function PromptInput() {
         </div>
       </div>
     </Spin>
+
   );
 }
 

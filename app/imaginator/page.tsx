@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { WalletButton } from "@/components";
+import { WalletButton ,MoveWallet} from "@/components";
 import Image from "next/image";
 import { DC_URL } from "@/constants";
 import { useRouter } from "next/navigation";
@@ -27,7 +27,8 @@ export default function ImaginatorPage() {
             Cybros | The Imaginator Demo
           </div>
         </div>
-        <WalletButton />
+        {/* <WalletButton /> */}
+        <MoveWallet></MoveWallet>
       </header>
       <div className="flex flex-col items-center">
         <div className="w-[1346px] ">

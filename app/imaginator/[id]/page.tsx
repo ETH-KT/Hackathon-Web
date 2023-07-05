@@ -9,7 +9,7 @@ import {
   dm_mono_font,
 } from "@/constants";
 import Link from "next/link";
-import { WalletButton } from "@/components";
+import { WalletButton,MoveWallet } from "@/components";
 import { useRouter } from "next/navigation";
 import { API_URL } from "@/constants";
 import axios from "axios";

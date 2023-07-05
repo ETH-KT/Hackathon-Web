@@ -77,11 +77,11 @@ const WalletButton = () => {
       onClick={
         !isLoading && isConnected
           ? () => {
-              disconnect();
-            }
+            disconnect();
+          }
           : () => {
-              connect({ connector: connectors[0] });
-            }
+            connect({ connector: connectors[0] });
+          }
       }
     >
       <Image
